@@ -30,7 +30,8 @@ bool Poligono<T>::es_ccw(){
         }
         return sum;
     }(this->vertices);
-    return total > 0;
+    bool result = total < 0;
+    return result;
 };
 
 

@@ -76,29 +76,34 @@ void test_vector(){
 
 
 void test_poligono(){
-    // Cuadrado unitario en CCW
+
+    // pentagono CCW
     std::vector<Punto<double>> pts = {
         Punto<double>(0.0, 0.0),
         Punto<double>(1.0, 0.0),
         Punto<double>(1.0, 1.0),
+        Punto<double>(0.5, 1.5),
         Punto<double>(0.0, 1.0)
     };
     Poligono<double> pol(pts);
 
-    assert(pol.size() == 4);
-    assert(std::abs(pol.area() - 1.0) < 1e-9);
+    assert(pol.size() == 5);
+    assert(std::abs(pol.area() - 1.25) < 1e-9);
     assert(pol.es_ccw());
 
     // Test toCCW: invertir y verificar que se corrige
     std::vector<Punto<double>> ptsCW = {
         Punto<double>(0.0, 1.0),
+        Punto<double>(0.5, 0.2),
         Punto<double>(1.0, 1.0),
         Punto<double>(1.0, 0.0),
         Punto<double>(0.0, 0.0)
     };
     Poligono<double> polCW(ptsCW);
+    std::cout << "Poligono CW: " << polCW << " es CCW? " << polCW.es_ccw() << "\n";
     assert(!polCW.es_ccw());
     polCW.invertir();
+    std::cout << "Poligono invertido: " << polCW << " es CCW? " << polCW.es_ccw() << "\n";
     assert(polCW.es_ccw());
 
     std::cout << "Poligono: " << pol << "\n";

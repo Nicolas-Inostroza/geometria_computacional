@@ -2,8 +2,8 @@
 #include <cassert>
 #include <cmath>
 #pragma once  
-template <typename T>
 
+template <typename T>
 Punto<T>::Punto(){
     this->x=0;
     this->y=0;
