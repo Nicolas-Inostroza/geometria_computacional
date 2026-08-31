@@ -1,25 +1,31 @@
 #include "punto.hpp"
-
+#pragma once  
 template <typename T>
 
-class vector{
+class Vector{
     private:
-        punto<T> origen;
+        Punto<T> origen;
     public:
-        vector();
-        vector(T x, T y);
-        vector(const punto<T> &p);
-        vector(const vector<T> &v);
-
+        Vector();
+        Vector(T x, T y);
+        Vector(T x, T y, T z);
+        Vector(const Punto<T> &p);
+        Vector(const Vector<T> &v);
+        
+        Punto<T> get_origen();
         double magnitud();
 
-        double producto_punto(const vector<T> &v);
-        vector<T> producto_cruz(const vector<T> &v);
+        double producto_punto(const Vector<T> &v);
+        Vector<T> producto_cruz(const Vector<T> &v);
 
-        vector<T> operator+(const vector<T> &v);
-        bool operator==(const vector<T> &v);
-        vector<T> operator*(T &escalar);
-        std::ostream &operator<<(std::ostream &os, const vector<T> &v);
+        Vector<T> operator+(const Vector<T> &v);
+        bool operator==(const Vector<T> &v);
+        Vector<T> operator*(T escalar);
 
-        ~vector();
+        friend std::ostream &operator<<(std::ostream &os, const Vector<T> &v){
+            os << v.origen;
+            return os;
+        };
+
+        ~Vector();
 };

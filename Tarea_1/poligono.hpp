@@ -1,21 +1,34 @@
 #include "punto.hpp"
+#include <ostream>
+#include <vector>
+#pragma once
 
 template <typename T>
 
-class poligono{
+class Poligono{
     private:
-        std::vector<punto<T>> vertices;
+        std::vector<Punto<T>> vertices;
     public:
-        poligono();
-        poligono(const std::vector<punto<T>> &v);
+        Poligono();
+        Poligono(const std::vector<Punto<T>> &v);
 
-        int get_num_vertices();
+        int size() const;
         bool es_ccw();
         void invertir();
         double area();
 
-        punto<T>& operator[](int i);
-        std::ostream &operator<<(std::ostream &os, const poligono<T> &p);
+        Punto<T>& operator[](int i);
+        const Punto<T>& operator[](int i) const;
+        
 
-        ~poligono();
+        friend std::ostream &operator<<(std::ostream &os, const Poligono<T> &p){
+            os<<"[";
+            for(int i=0;i<p.size();i++){
+                os<<p[i]<<" ";
+            }
+            os <<"]";
+            return os;
+        };
+
+        ~Poligono();
 };

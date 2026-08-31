@@ -1,63 +1,68 @@
-
 #include "poligono.hpp"
 #include "punto.hpp"
+#include <vector>
+#include <algorithm>
+
 
 template <typename T>
-
-class poligono{
-    private:
-        std::vector<punto<T>> vertices;
-    public:
-        poligono(){
-            this->vertices=std::vector<punto<T>>();
-        };
-        poligono(const std::vector<punto<T>> &v){
-            this->vertices=v;
-        };
-
-        int get_num_vertices(){
-            return this->vertices.size();
-        };
-        bool es_ccw(){
-            double total = lambda [](const std::vector<punto<T>> &v){
-                double sum = 0;
-                for(int i=0;i<v.size();i++){
-                    int j=(i+1)%v.size();
-                    sum += (v[j].x-v[i].x)*(v[j].y+v[i].y);
-                }
-                return sum;
-            }(this->vertices);
-        };
-
-
-        void invertir(){
-            std::vector<punto<T>> vertices_invertidos = this->vertices;
-            std::reverse(vertices_invertidos.begin(),vertices_invertidos.end());
-            this->vertices=vertices_invertidos;
-        };
-
-        double area(){
-            if(!this->es_ccw()){
-                this->invertir();
-            }
-            double total = 0;
-            for(int i=0;i<this->get_num_vertices();i++){
-                int j=(i+1)%this->get_num_vertices();
-                total += (this->vertices[i].x*this->vertices[j].y - this->vertices[j].x*this->vertices[i].y);
-            }
-        };
-
-        punto<T>& operator[](int i){
-            return this->vertices[i];
-        };
-        std::ostream &operator<<(std::ostream &os, const poligono<T> &p){
-            os<<"[";
-            for(int i=0;i<p.get_num_vertices();i++){
-                os<<p[i]<<" ";
-            }
-            <<"]";
-            return os;
-        };
-
-        ~poligono();
+Poligono<T>::Poligono(){
+    this->vertices=std::vector<Punto<T>>();
 };
+
+template <typename T>
+Poligono<T>::Poligono(const std::vector<Punto<T>> &v) {
+    this->vertices=v;
+};
+
+template <typename T>
+int Poligono<T>::size() const{
+    return this->vertices.size();
+};
+
+
+template <typename T>
+bool Poligono<T>::es_ccw(){
+    double total = [](const std::vector<Punto<T>> &v){
+        double sum = 0;
+        for(int i = 0; i < (int)v.size(); i++){
+            int j = (i+1) % v.size();
+            sum += (v[j].get_x() - v[i].get_x()) * (v[j].get_y() + v[i].get_y());
+        }
+        return sum;
+    }(this->vertices);
+    return total > 0;
+};
+
+
+template <typename T>
+void Poligono<T>::invertir(){
+    std::vector<Punto<T>> vertices_invertidos = this->vertices;
+    std::reverse(vertices_invertidos.begin(),vertices_invertidos.end());
+    this->vertices=vertices_invertidos;
+};
+
+template <typename T>
+double Poligono<T>::area(){
+    if(!this->es_ccw()){
+        this->invertir();
+    }
+    double total = 0;
+    for(int i=0;i<this->size();i++){
+        int j=(i+1)%this->size();
+        total += (this->vertices[i].get_x()*this->vertices[j].get_y() - this->vertices[j].get_x()*this->vertices[i].get_y());
+    }
+    return std::abs(total)/2.0;
+};
+
+template <typename T>
+Punto<T>& Poligono<T>::operator[](int i) {
+     return this->vertices[i];
+}
+
+template <typename T>
+const Punto<T>& Poligono<T>::operator[](int i) const {
+    return this->vertices[i];
+}
+
+template <typename T>
+Poligono<T>::~Poligono() = default;

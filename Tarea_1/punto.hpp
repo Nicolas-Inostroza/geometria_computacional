@@ -1,22 +1,33 @@
+#include <iostream>
+#pragma once  
 
 template <typename T>
 
-class punto
-{
+
+class Punto{
 private:
     T x;
     T y;
     T z;
 public:
-    punto();
-    punto(T x, T y);
-    punto(const punto<T> &p);
+    Punto();
+    Punto(T x, T y);
+    Punto(T x, T y, T z);
+    Punto(const Punto<T> &p);
 
-    double distancia(const punto<T> &p);
+    T get_x() const;
+    T get_y() const;
+    T get_z() const;
 
-    bool operator==(const punto<T> &p);
+    double distancia(const Punto<T> &p);
 
-    std::ostream &operator<<(std::ostream &os,const punto<T> &p);
+    bool operator==(const Punto<T> &p);
 
-    ~punto();
+    friend std::ostream& operator<<(std::ostream &os, const Punto<T> &p) {
+        os << "(" << p.x << ", " << p.y << ", " << p.z << ")";
+        return os;
+    }
+
+    ~Punto();
 };
+

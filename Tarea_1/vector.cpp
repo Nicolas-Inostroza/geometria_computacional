@@ -1,60 +1,72 @@
-#include "punto.hpp"
 #include "vector.hpp"
 
 template <typename T>
-
-class vector{
-    private:
-        punto<T> origen;
-    public:
-        vector(){
-            this->origen=punto<T>();
-        };
-        vector(T x, T y){
-            this->origen=punto<T>(x,y);
-        };
-        vector(const punto<T> &p){
-            this->origen=p;
-        };
-        vector(const vector<T> &v){
-            this->origen=v.origen;
-        };
-
-        double magnitud(){
-            double mag = sqrt(pow(this->origen.x,2)+pow(this->origen.y,2)+pow(this->origen.z,2));
-            return mag;
-        };
-
-        double producto_punto(const vector<T> &v){
-            double prod = this->origen.x*v.origen.x + this->origen.y*v.origen.y + this->origen.z*v.origen.z;
-            return prod;
-        };
-        vector<T> producto_cruz(const vector<T> &v){
-            double x_resultado = this->origen.y*v.origen.z - this->origen.z*v.origen.y;
-            double y_resultado = this->origen.z*v.origen.x - this->origen.x*v.origen.z;
-            double z_resultado = this->origen.x*v.origen.y - this->origen.y*v.origen.x;
-            return vector<T>(x_resultado,y_resultado,z_resultado);
-        };
-
-        vector<T> operator+(const vector<T> &v){
-            return vector<T>(this->x+v.origen.x,this->y+v.origen.y,this->z+v.origen.z);
-        };
-        bool operator==(const vector<T> &v){
-            return (this->origen==v.origen);
-        };
-        vector<T> operator*(T &escalar){
-            this->origen.x*=escalar
-            this->origen.y*=escalar
-            this->origen.z*=escalar
-            return *this;
-        };
-        std::ostream &operator<<(std::ostream &os, const vector<T> &v){
-            os<<"("<<v.origen.x<<","<<v.origen.y<<","<<v.origen.z<<")";
-            return os;
-        };
-
-        ~vector(){
-            ~origen;
-            ~this;
-        };
+Vector<T>::Vector(){
+    this->origen=Punto<T>();
 };
+
+template <typename T>
+Vector<T>::Vector(T x, T y){
+    this->origen=Punto<T>(x,y);
+};
+
+template <typename T>
+Vector<T>::Vector(T x, T y, T z){
+    this->origen=Punto<T>(x,y,z);
+};
+
+template <typename T>
+Vector<T>::Vector(const Punto<T> &p){
+    this->origen=p;
+};
+
+template <typename T>
+Vector<T>::Vector(const Vector<T> &v){
+    this->origen=v.origen;
+};
+
+template <typename T>
+Punto<T> Vector<T>::get_origen(){
+    return this->origen;
+};
+
+template <typename T>
+double Vector<T>::magnitud(){
+    double mag = sqrt(pow(this->origen.get_x(),2)+pow(this->origen.get_y(),2)+pow(this->origen.get_z(),2));
+    return mag;
+};
+
+template <typename T>
+double Vector<T>::producto_punto(const Vector<T> &v){
+    double prod = this->origen.get_x()*v.origen.get_x() + this->origen.get_y()*v.origen.get_y() + this->origen.get_z()*v.origen.get_z();
+    return prod;
+};
+
+template <typename T>
+Vector<T> Vector<T>::producto_cruz(const Vector<T> &v){
+    double x_resultado = this->origen.get_x()*v.origen.get_z() - this->origen.get_z()*v.origen.get_y();
+    double y_resultado = this->origen.get_z()*v.origen.get_x() - this->origen.get_x()*v.origen.get_z();
+    double z_resultado = this->origen.get_x()*v.origen.get_y() - this->origen.get_y()*v.origen.get_x();
+    return Vector<T>(x_resultado,y_resultado,z_resultado);
+};
+
+template <typename T>
+Vector<T> Vector<T>::operator+(const Vector<T> &v){
+    return Vector<T>(this->origen.get_x()+v.origen.get_x(),this->origen.get_y()+v.origen.get_y(),this->origen.get_z()+v.origen.get_z());
+};
+
+template <typename T>
+bool Vector<T>::operator==(const Vector<T> &v){
+    return (this->origen==v.origen);
+};
+
+template <typename T>
+Vector<T> Vector<T>::operator*(T escalar){
+    T x_resultado = this->origen.get_x() * escalar;
+    T y_resultado = this->origen.get_y() * escalar;
+    T z_resultado = this->origen.get_z() * escalar;
+    return Vector<T>(x_resultado,y_resultado,z_resultado);
+};
+
+template <typename T>
+Vector<T>::~Vector()=default;
