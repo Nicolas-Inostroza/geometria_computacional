@@ -17,23 +17,20 @@ void test_punto(){
     Punto<double> p2(3.0, 4.0);
     Punto<double> p3(p2);
 
-    std::cout << "Test de igualdad" <<p2 << " == " << p3 << "\n";
+    std::cout << "Test de igualdad\n";
     assert(p2 == p3);
     std::cout << "[OK] Igualdad\n";
 
-    std::cout << "Test de desigualdad" <<p1 << " != " << p3 << "\n";
+    std::cout << "Test de desigualdad\n";
     assert(!(p1 == p3));
     std::cout << "[OK] Desigualdad\n";
 
-    std::cout << "Test de distancia entre puntos" <<p1 << " y " << p2 << "\n";
+    std::cout << "Test de distancia entre puntos\n";
     
-    assert(std::abs(p1.distancia(p2) - 5.0) < epsilon);
-    std::cout <<"Distancioa obtenida: "<< p1.distancia(p2)<< "\n";
+    assert(casi_igual(p1.distancia(p2), 5.0));
 
-    std::cout << "Test de distancia entre puntos" <<p2 << " y " << p3 << "\n";
-    assert(std::abs(p2.distancia(p3))==0);
-    std::cout <<"Distancioa obtenida: "<< p2.distancia(p3)<< "\n" << "[OK] Distancia\n";
-    std::cout << "[OK] Punto\n";
+    assert(casi_igual(p2.distancia(p3),0));
+    std::cout <<"[OK] Distancia\n";
 
     Punto<double> p4(-1e150, 2e150, -3e150);
     Punto<double> p5(-1e150 + 3e150, 2e150 - 4e150, -3e150);
@@ -53,57 +50,61 @@ void test_vector(){
     Vector<double> v2(3.0, 4.0);
     Vector<double> v3(v2);
     Vector<double> v4(p1);
+    Vector<double> v5 = v1.producto_cruz(v2);
+    Vector<double> v6 = v1 + v2;
+    Vector<double> v7 = v1 * 2.0;
+    Vector<double> v8(-1e150, 2e150, -3e150);
+    Vector<double> v9(4e150, -5e150, 6e150);
+    Vector<double> v10(1e-150, -2e-150, 3e-150);
+    Vector<double> v11(-4e-150, 5e-150, -6e-150);
+    Vector<double> cruz = Vector<double>(1.0, 2.0, 3.0).producto_cruz(
+        Vector<double>(4.0, 5.0, 6.0));
 
-    std::cout << "Test de igualdad" <<v2 << " == " << v3 << "\n";
+    std::cout << "Test de igualdad\n";
     assert(v2 == v3);
     assert(v4.get_origen() == p1);
     std::cout << "[OK] Igualdad\n";
 
-    std::cout << "Test de desigualdad" <<v1 << " != " << v3 << "\n";
+    std::cout << "Test de desigualdad\n";
     assert(!(v1 == v3));
     std::cout << "[OK] Desigualdad\n";
 
-    std::cout << "Test de magnitud de vector" <<v1 << "\n";
+    std::cout << "Test de magnitud de vector\n";
     
     assert(std::abs(v1.magnitud() - sqrt(5.0))==0);
     std::cout <<"Magnitud obtenida: "<< v1.magnitud()<< "\n";
 
-    std::cout << "Test de magnitud de vector" <<v2 << "\n";
+    std::cout << "Test de magnitud de vector\n";
     assert(std::abs(v2.magnitud() - 5.0) < epsilon);
-    std::cout <<"Magnitud obtenida: "<< v2.magnitud()<< "\n" << "[OK] Magnitud\n";
-
-    std::cout << "Test de producto punto" <<v1 << " . " << v2 << "\n";
-    assert(std::abs(v1.producto_punto(v2) - 11.0) < epsilon);
-    std::cout <<"Producto punto obtenido: "<< v1.producto_punto(v2)<< "\n" << "[OK] Producto punto\n";
-    
-    std::cout << "Test de producto cruz" <<v1 << " x " << v2 << "\n";
-    Vector<double> v5 = v1.producto_cruz(v2);
-    std::cout <<"Producto cruz obtenido: "<< v5 << "\n" << "[OK] Producto cruz\n";
-    std::cout << "Test de suma de vectores" <<v1 << " + " << v2 << "\n";
-    Vector<double> v6 = v1 + v2;
-    assert(v6 == Vector<double>(4.0, 6.0));
-    std::cout <<"Suma obtenida: "<< v6 << "\n" << "[OK] Suma\n";
-    std::cout << "Test de multiplicacion por escalar " <<v1 << " * 2.0\n";
-    Vector<double> v7 = v1 * 2.0;
-    assert(v7 == Vector<double>(2.0, 4.0));
-    std::cout <<"Multiplicacion obtenida: "<< v7 << "\n" << "[OK] Multiplicacion\n";
-    std::cout << "[OK] Vector\n";
-
-    Vector<double> v8(-1e150, 2e150, -3e150);
-    Vector<double> v9(4e150, -5e150, 6e150);
-    assert(casi_igual(v8.producto_punto(v9), -32e300));
     assert(casi_igual(v8.magnitud(), std::sqrt(14e300)));
+    std::cout <<"[OK] Magnitud\n";
 
-    Vector<double> v10(1e-150, -2e-150, 3e-150);
-    Vector<double> v11(-4e-150, 5e-150, -6e-150);
+    std::cout << "Test de producto punto\n";
+    assert(casi_igual(v1.producto_punto(v2), 11.0));
+    assert(casi_igual(v8.producto_punto(v9), -32e300));
     assert(casi_igual(v10.producto_punto(v11), -32e-300));
-
-    Vector<double> cruz = Vector<double>(1.0, 2.0, 3.0).producto_cruz(
-        Vector<double>(4.0, 5.0, 6.0));
+    std::cout <<"[OK] Producto punto\n";
+    
+    std::cout << "Test de producto cruz\n";
+  
+    assert(v5 == Vector<double>(0.0, 0.0, -2.0));
     assert(cruz == Vector<double>(-3.0, 6.0, -3.0));
+    std::cout << "[OK] Producto cruz\n";
+
+
+
+    std::cout << "Test de suma de vectores\n";
+    assert(v6 == Vector<double>(4.0, 6.0));
+    std::cout <<"[OK] Suma\n";
+
+
+
+    
+    std::cout << "Test de multiplicacion por escalar \n";
+    assert(v7 == Vector<double>(2.0, 4.0));
     assert((Vector<double>(-1.0, 2.0, -3.0) * -2.0) ==
            Vector<double>(2.0, -4.0, 6.0));
-    std::cout << "[OK] Vector: negativos, 3D y escalas extremas\n";
+    std::cout <<"[OK] Multiplicacion\n";
 
 }
 
@@ -166,9 +167,11 @@ void test_poligono(){
 int main() {
     
     test_punto();
-    std::cout << "[OK] Todos los tests pasaron exitosamente.\n\n";
+    std::cout << "[OK] Todos los tests de PUNTO pasaron exitosamente.\n\n";
     test_vector();
-    std::cout << "[OK] Todos los tests pasaron exitosamente.\n\n";
+    std::cout << "[OK] Todos los tests de VECTOR pasaron exitosamente.\n\n";
     test_poligono();
+    std::cout << "[OK] Todos los tests de POLIGONO pasaron exitosamente.\n\n";
+    std::cout << "Todos los tests pasaron exitosamente.\n";
     return 0;
 }
