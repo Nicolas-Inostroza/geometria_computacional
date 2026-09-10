@@ -44,7 +44,7 @@ double Vector<T>::producto_punto(const Vector<T> &v){
 
 template <typename T>
 Vector<T> Vector<T>::producto_cruz(const Vector<T> &v){
-    double x_resultado = this->origen.get_x()*v.origen.get_z() - this->origen.get_z()*v.origen.get_y();
+    double x_resultado = this->origen.get_y()*v.origen.get_z() - this->origen.get_z()*v.origen.get_y();
     double y_resultado = this->origen.get_z()*v.origen.get_x() - this->origen.get_x()*v.origen.get_z();
     double z_resultado = this->origen.get_x()*v.origen.get_y() - this->origen.get_y()*v.origen.get_x();
     return Vector<T>(x_resultado,y_resultado,z_resultado);

@@ -5,6 +5,13 @@
 #include <ostream>
 #include <cmath>
 
+double epsilon = 1e-9;
+
+bool casi_igual(double valor, double esperado) {
+    double tolerancia = epsilon * std::max(1.0, std::abs(esperado));
+    return std::abs(valor - esperado) <= tolerancia;
+}
+
 void test_punto(){
     Punto<double> p1(0.0, 0.0);
     Punto<double> p2(3.0, 4.0);
@@ -20,13 +27,23 @@ void test_punto(){
 
     std::cout << "Test de distancia entre puntos" <<p1 << " y " << p2 << "\n";
     
-    assert(std::abs(p1.distancia(p2) - 5.0) < 1e-9);
+    assert(std::abs(p1.distancia(p2) - 5.0) < epsilon);
     std::cout <<"Distancioa obtenida: "<< p1.distancia(p2)<< "\n";
 
     std::cout << "Test de distancia entre puntos" <<p2 << " y " << p3 << "\n";
     assert(std::abs(p2.distancia(p3))==0);
     std::cout <<"Distancioa obtenida: "<< p2.distancia(p3)<< "\n" << "[OK] Distancia\n";
     std::cout << "[OK] Punto\n";
+
+    Punto<double> p4(-1e150, 2e150, -3e150);
+    Punto<double> p5(-1e150 + 3e150, 2e150 - 4e150, -3e150);
+    assert(casi_igual(p4.distancia(p5), 5e150));
+
+    Punto<double> p6(1e-150, -2e-150, 3e-150);
+    Punto<double> p7(4e-150, 2e-150, 3e-150);
+    assert(casi_igual(p6.distancia(p7), 5e-150));
+    assert(Punto<double>(-4.0, -5.0, -6.0) == Punto<double>(-4.0, -5.0, -6.0));
+    std::cout << "[OK] Punto: negativos y escalas extremas\n";
 
 }
 
@@ -52,11 +69,11 @@ void test_vector(){
     std::cout <<"Magnitud obtenida: "<< v1.magnitud()<< "\n";
 
     std::cout << "Test de magnitud de vector" <<v2 << "\n";
-    assert(std::abs(v2.magnitud() - 5.0) < 1e-9);
+    assert(std::abs(v2.magnitud() - 5.0) < epsilon);
     std::cout <<"Magnitud obtenida: "<< v2.magnitud()<< "\n" << "[OK] Magnitud\n";
 
     std::cout << "Test de producto punto" <<v1 << " . " << v2 << "\n";
-    assert(std::abs(v1.producto_punto(v2) - 11.0) < 1e-9);
+    assert(std::abs(v1.producto_punto(v2) - 11.0) < epsilon);
     std::cout <<"Producto punto obtenido: "<< v1.producto_punto(v2)<< "\n" << "[OK] Producto punto\n";
     
     std::cout << "Test de producto cruz" <<v1 << " x " << v2 << "\n";
@@ -71,6 +88,22 @@ void test_vector(){
     assert(v7 == Vector<double>(2.0, 4.0));
     std::cout <<"Multiplicacion obtenida: "<< v7 << "\n" << "[OK] Multiplicacion\n";
     std::cout << "[OK] Vector\n";
+
+    Vector<double> v8(-1e150, 2e150, -3e150);
+    Vector<double> v9(4e150, -5e150, 6e150);
+    assert(casi_igual(v8.producto_punto(v9), -32e300));
+    assert(casi_igual(v8.magnitud(), std::sqrt(14e300)));
+
+    Vector<double> v10(1e-150, -2e-150, 3e-150);
+    Vector<double> v11(-4e-150, 5e-150, -6e-150);
+    assert(casi_igual(v10.producto_punto(v11), -32e-300));
+
+    Vector<double> cruz = Vector<double>(1.0, 2.0, 3.0).producto_cruz(
+        Vector<double>(4.0, 5.0, 6.0));
+    assert(cruz == Vector<double>(-3.0, 6.0, -3.0));
+    assert((Vector<double>(-1.0, 2.0, -3.0) * -2.0) ==
+           Vector<double>(2.0, -4.0, 6.0));
+    std::cout << "[OK] Vector: negativos, 3D y escalas extremas\n";
 
 }
 
@@ -108,6 +141,26 @@ void test_poligono(){
 
     std::cout << "Poligono: " << pol << "\n";
     std::cout << "[OK] Poligono\n";
+
+    std::vector<Punto<double>> ptsNegativos = {
+        Punto<double>(-3.0, -2.0),
+        Punto<double>(-1.0, -2.0),
+        Punto<double>(-1.0, 1.0),
+        Punto<double>(-3.0, 1.0)
+    };
+    Poligono<double> polNegativos(ptsNegativos);
+    assert(polNegativos.es_ccw());
+    assert(casi_igual(polNegativos.area(), 6.0));
+
+    std::vector<Punto<double>> ptsGrande = {
+        Punto<double>(-2e100, -1e100),
+        Punto<double>(2e100, -1e100),
+        Punto<double>(2e100, 1e100),
+        Punto<double>(-2e100, 1e100)
+    };
+    Poligono<double> polGrande(ptsGrande);
+    assert(casi_igual(polGrande.area(), 8e200));
+    std::cout << "[OK] Poligono: negativos y escala grande\n";
 }
 
 int main() {
