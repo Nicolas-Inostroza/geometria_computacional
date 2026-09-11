@@ -17,6 +17,7 @@ public:
     Punto(T x, T y, T z);
     //Contructor copia
     Punto(const Punto<T> &p);
+    Punto<T>& operator=(const Punto<T> &p) = default;
     //Getters
     T get_x() const;
     T get_y() const;
