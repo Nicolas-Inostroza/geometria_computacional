@@ -1,9 +1,14 @@
 #include "punto.cpp"
 #include "vector.cpp"
 #include "poligono.cpp"
+#include "incrementalalgorithm.hpp"
+#include "randomincremental.hpp"
+#include <algorithm>
 #include <cassert>
 #include <ostream>
 #include <cmath>
+#include <string>
+#include <vector>
 
 double epsilon = 1e-9;
 
@@ -164,6 +169,113 @@ void test_poligono(){
     std::cout << "[OK] Poligono: negativos y escala grande\n";
 }
 
+template <typename T>
+bool tiene_mismos_vertices(
+    const Poligono<T>& hull,
+    const std::vector<Punto<T>>& expected
+) {
+    if (hull.size() != static_cast<int>(expected.size())) {
+        return false;
+    }
+
+    for (int i = 0; i < hull.size(); ++i) {
+        bool found = false;
+        for (const Punto<T>& point : expected) {
+            if (hull[i].get_x() == point.get_x() &&
+                hull[i].get_y() == point.get_y()) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+template <typename T>
+void test_convex_hull_case(
+    const std::string& name,
+    const std::vector<Punto<T>>& cloud,
+    const std::vector<Punto<T>>& expected
+) {
+    IncrementalAlgorithm<T> incremental;
+    RandomIncrementalAlgorithm<T> random_incremental;
+
+    const Poligono<T> expected_hull = incremental.apply(cloud);
+    assert(tiene_mismos_vertices(expected_hull, expected));
+
+    // El algoritmo aleatorio puede producir un orden de inserción distinto;
+    // repetir la prueba verifica que cada permutación conserva la misma hull.
+    for (int attempt = 0; attempt < 5; ++attempt) {
+        const Poligono<T> actual_hull = random_incremental.apply(cloud);
+        assert(tiene_mismos_vertices(actual_hull, expected));
+    }
+
+    std::cout << "[OK] Cerradura convexa: " << name << '\n';
+}
+
+template <typename T>
+void test_convex_hull_algorithms_for_type(const std::string& type_name) {
+    test_convex_hull_case<T>(type_name + ": nube vacia", {}, {});
+
+    test_convex_hull_case<T>(
+        type_name + ": un punto",
+        {{T(2), T(3)}},
+        {{T(2), T(3)}}
+    );
+
+    test_convex_hull_case<T>(
+        type_name + ": puntos repetidos iguales",
+        {{T(2), T(3)}, {T(2), T(3)}, {T(2), T(3)}},
+        {{T(2), T(3)}}
+    );
+
+    test_convex_hull_case<T>(
+        type_name + ": dos puntos distintos",
+        {{T(4), T(1)}, {T(-1), T(2)}},
+        {{T(-1), T(2)}, {T(4), T(1)}}
+    );
+
+    test_convex_hull_case<T>(
+        type_name + ": nube colineal",
+        {{T(1), T(1)}, {T(-2), T(-2)}, {T(3), T(3)},
+         {T(0), T(0)}, {T(1), T(1)}},
+        {{T(-2), T(-2)}, {T(3), T(3)}}
+    );
+
+    test_convex_hull_case<T>(
+        type_name + ": triangulo con puntos interiores",
+        {{T(0), T(0)}, {T(4), T(0)}, {T(0), T(3)},
+         {T(1), T(1)}, {T(2), T(0)}, {T(0), T(0)}},
+        {{T(0), T(0)}, {T(4), T(0)}, {T(0), T(3)}}
+    );
+
+    test_convex_hull_case<T>(
+        type_name + ": cuadrado con interiores, bordes y duplicados",
+        {{T(0), T(0)}, {T(2), T(0)}, {T(2), T(2)}, {T(0), T(2)},
+         {T(1), T(1)}, {T(1), T(0)}, {T(2), T(1)}, {T(0), T(0)}},
+        {{T(0), T(0)}, {T(2), T(0)}, {T(2), T(2)}, {T(0), T(2)}}
+    );
+
+    test_convex_hull_case<T>(
+        type_name + ": poligono convexo irregular",
+        {{T(0), T(0)}, {T(4), T(0)}, {T(5), T(2)}, {T(3), T(5)},
+         {T(0), T(4)}, {T(2), T(2)}, {T(1), T(1)}, {T(3), T(1)}},
+        {{T(0), T(0)}, {T(4), T(0)}, {T(5), T(2)}, {T(3), T(5)},
+         {T(0), T(4)}}
+    );
+}
+
+void test_convex_hull_algorithms() {
+    test_convex_hull_algorithms_for_type<int>("int");
+    test_convex_hull_algorithms_for_type<float>("float");
+    test_convex_hull_algorithms_for_type<double>("double");
+    std::cout << "[OK] Todos los tests de cerradura convexa pasaron.\n\n";
+}
+
 int main() {
     
     test_punto();
@@ -172,6 +284,7 @@ int main() {
     std::cout << "[OK] Todos los tests de VECTOR pasaron exitosamente.\n\n";
     test_poligono();
     std::cout << "[OK] Todos los tests de POLIGONO pasaron exitosamente.\n\n";
+    test_convex_hull_algorithms();
     std::cout << "Todos los tests pasaron exitosamente.\n";
     return 0;
 }

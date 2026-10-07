@@ -1,41 +1,44 @@
 #pragma once
 
 #include "convexhullstrategy.hpp"
+#include "vector.hpp"
 #include <algorithm>
 #include <vector>
 
 template <typename T>
 class IncrementalAlgorithm : public ConvexHullStrategy<T> {
 private:
-    static long double cross(
+    static T cross(
         const Punto<T>& a,
         const Punto<T>& b,
         const Punto<T>& c
     ) {
-        const long double abx =
-            static_cast<long double>(b.get_x()) - a.get_x();
-        const long double aby =
-            static_cast<long double>(b.get_y()) - a.get_y();
-        const long double acx =
-            static_cast<long double>(c.get_x()) - a.get_x();
-        const long double acy =
-            static_cast<long double>(c.get_y()) - a.get_y();
+        const T abx = b.get_x() - a.get_x();
+        const T aby = b.get_y() - a.get_y();
+        const T acx = c.get_x() - a.get_x();
+        const T acy = c.get_y() - a.get_y();
 
-        return abx * acy - aby * acx;
+        Vector<T> ab(abx, aby);
+        Vector<T> ac(acx, acy);
+        Vector<T> cross_product = ab.producto_cruz(ac);
+        return cross_product.get_origen().get_z();
     }
 
 public:
-    Poligono<T> apply(const std::vector<Punto<T>>& cloud) const override {
-        std::vector<Punto<T>> points = cloud;
+    Poligono<T> apply(const std::vector<Punto<T>>& nube_puntos) const override {
+        std::vector<Punto<T>> points = nube_puntos;
+        std::vector<Punto<T>> puntos_inferiores;
+        std::vector<Punto<T>> puntos_superiores;
+        
 
-        std::sort(points.begin(), points.end(),
-            [](const Punto<T>& a, const Punto<T>& b) {
+        // Oredenasmos la nube de puntos de izquierda a derecha y de abajo hacia arriba.
+        std::sort(points.begin(), points.end(), [](const Punto<T>& a, const Punto<T>& b) {
                 if (a.get_x() != b.get_x())
                     return a.get_x() < b.get_x();
                 return a.get_y() < b.get_y();
             });
 
-        // Quita puntos repetidos en el plano XY.
+        // Quita puntos repetidos o solapados entre ellos en el plano XY.
         points.erase(
             std::unique(points.begin(), points.end(),
                 [](const Punto<T>& a, const Punto<T>& b) {
@@ -44,33 +47,39 @@ public:
                 }),
             points.end()
         );
-
+        // Si hay 2 o menos puntos restantes devolvemos la linea o punto restante como un "poligono".
         if (points.size() <= 2)
             return Poligono<T>(points);
 
-        std::vector<Punto<T>> lower;
+        
+        // Recorre los puntos ordenados de izquierda a derecha para construir la cadena inferior de la cerradura convexa.
         for (const Punto<T>& p : points) {
-            while (lower.size() >= 2 &&
-                   cross(lower[lower.size() - 2], lower.back(), p) <= 0) {
-                lower.pop_back();
+            // Mientras los dos últimos vértices y p no formen un giro antihorario, el último vértice no pertenece al borde inferior y se elimina de los puntos inferiores.
+            while (puntos_inferiores.size() >= 2 && cross(puntos_inferiores[puntos_inferiores.size() - 2], puntos_inferiores.back(), p) <= 0) {
+                puntos_inferiores.pop_back();
             }
-            lower.push_back(p);
+            // Agrega p después de eliminar los vértices que quedaban hacia adentro.
+            puntos_inferiores.push_back(p);
         }
 
-        std::vector<Punto<T>> upper;
+        
+
+        // Recorre los puntos en orden inverso, de derecha a izquierda, para construir la cadena superior de la cerradura convexa.
         for (auto it = points.rbegin(); it != points.rend(); ++it) {
-            while (upper.size() >= 2 &&
-                   cross(upper[upper.size() - 2], upper.back(), *it) <= 0) {
-                upper.pop_back();
+            // Si los dos últimos vértices y el punto actual no forman un giro antihorario, elimina el último vértice.
+            while (puntos_superiores.size() >= 2 &&
+                   cross(puntos_superiores[puntos_superiores.size() - 2], puntos_superiores.back(), *it) <= 0) {
+                puntos_superiores.pop_back();
             }
-            upper.push_back(*it);
+            // Agrega el punto actual a la cadena superior.
+            puntos_superiores.push_back(*it);
         }
 
         // Los extremos aparecen en ambas listas; se quitan antes de unirlas.
-        lower.pop_back();
-        upper.pop_back();
-        lower.insert(lower.end(), upper.begin(), upper.end());
+        puntos_inferiores.pop_back();
+        puntos_superiores.pop_back();
+        puntos_inferiores.insert(puntos_inferiores.end(), puntos_superiores.begin(), puntos_superiores.end());
 
-        return Poligono<T>(lower);
+        return Poligono<T>(puntos_inferiores);
     }
 };
