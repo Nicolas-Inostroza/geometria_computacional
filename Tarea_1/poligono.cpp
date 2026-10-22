@@ -44,9 +44,6 @@ void Poligono<T>::invertir(){
 
 template <typename T>
 double Poligono<T>::area(){
-    if(!this->es_ccw()){
-        this->invertir();
-    }
     double total = 0;
     for(int i=0;i<this->size();i++){
         int j=(i+1)%this->size();

@@ -3,6 +3,7 @@
 #include "poligono.cpp"
 #include <cassert>
 #include <ostream>
+#include <sstream>
 #include <cmath>
 
 double epsilon = 1e-9;
@@ -136,6 +137,12 @@ void test_poligono(){
     Poligono<double> polCW(ptsCW);
     std::cout << "Poligono CW: " << polCW << " es CCW? " << polCW.es_ccw() << "\n";
     assert(!polCW.es_ccw());
+    const double areaCW = polCW.area();
+    assert(casi_igual(areaCW, 0.6));
+    assert(!polCW.es_ccw());
+    for(int i = 0; i < polCW.size(); i++){
+        assert(polCW[i] == ptsCW[i]);
+    }
     polCW.invertir();
     std::cout << "Poligono invertido: " << polCW << " es CCW? " << polCW.es_ccw() << "\n";
     assert(polCW.es_ccw());
@@ -164,6 +171,24 @@ void test_poligono(){
     std::cout << "[OK] Poligono: negativos y escala grande\n";
 }
 
+void test_operadores_salida(){
+    std::ostringstream salidaPunto;
+    salidaPunto << Punto<int>(1, -2, 3);
+    assert(salidaPunto.str() == "(1,-2,3)");
+
+    std::ostringstream salidaPoligono;
+    salidaPoligono << Poligono<int>({
+        Punto<int>(0, 0),
+        Punto<int>(1, 0, 2)
+    });
+    assert(salidaPoligono.str() == "[(0,0,0),(1,0,2)]");
+
+    std::ostringstream salidaPoligonoVacio;
+    salidaPoligonoVacio << Poligono<int>();
+    assert(salidaPoligonoVacio.str() == "[]");
+    std::cout << "[OK] Operadores de salida\n";
+}
+
 int main() {
     
     test_punto();
@@ -172,6 +197,7 @@ int main() {
     std::cout << "[OK] Todos los tests de VECTOR pasaron exitosamente.\n\n";
     test_poligono();
     std::cout << "[OK] Todos los tests de POLIGONO pasaron exitosamente.\n\n";
+    test_operadores_salida();
     std::cout << "Todos los tests pasaron exitosamente.\n";
     return 0;
 }

@@ -28,10 +28,9 @@ public:
     bool operator==(const Punto<T> &p);
     //print
     friend std::ostream& operator<<(std::ostream &os, const Punto<T> &p) {
-        os << "(" << p.x << ", " << p.y << ", " << p.z << ")";
+        os << "(" << p.x << "," << p.y << "," << p.z << ")";
         return os;
     }
 
     ~Punto();
 };
-

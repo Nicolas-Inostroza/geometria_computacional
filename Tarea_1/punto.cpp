@@ -55,10 +55,4 @@ bool Punto<T>::operator==(const Punto<T>& p) {
 }
 
 template <typename T>
-std::ostream &operator<<(std::ostream &os, const Punto<T> &p) {
-    os << "(" << p.x << "," << p.y << "," << p.z << ")";
-    return os;
-}
-
-template <typename T>
 Punto<T>::~Punto()=default;

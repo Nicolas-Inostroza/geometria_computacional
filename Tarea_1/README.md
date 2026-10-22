@@ -13,6 +13,8 @@ Implementación de clases básicas de geometría computacional: puntos, vectores
 
 Los tests de las clases se encuentran en el archivo `test.cpp`. Incluye pruebas para `Punto`, `Vector` y `Poligono`.
 
+Las pruebas incluyen los formatos de salida de `Punto` y `Poligono`, y verifican que calcular el área no modifica el orden de los vértices.
+
 Se requiere un compilador compatible con C++17, como `g++`.
 
 ## Ejecución

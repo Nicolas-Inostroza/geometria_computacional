@@ -28,8 +28,11 @@ class Poligono{
         // Print
         friend std::ostream &operator<<(std::ostream &os, const Poligono<T> &p){
             os<<"[";
-            for(int i=0;i<p.size();i++){
-                os<<p[i]<<" ";
+            for(int i = 0; i < p.size(); i++){
+                if(i > 0){
+                    os<<",";
+                }
+                os<<p[i];
             }
             os <<"]";
             return os;
