@@ -2,11 +2,13 @@
 #include "vector.cpp"
 #include "poligono.cpp"
 #include "incrementalalgorithm.hpp"
-#include "randomincremental.hpp"
+#include "randomincrementalalgorithm.hpp"
+#include "pointcloudgenerator.hpp"
 #include <algorithm>
 #include <cassert>
 #include <ostream>
 #include <cmath>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -196,20 +198,47 @@ bool tiene_mismos_vertices(
 }
 
 template <typename T>
+bool tiene_mismos_vertices(
+    const Poligono<T>& first,
+    const Poligono<T>& second
+) {
+    if (first.size() != second.size()) {
+        return false;
+    }
+
+    for (int i = 0; i < first.size(); ++i) {
+        bool found = false;
+        for (int j = 0; j < second.size(); ++j) {
+            if (first[i].get_x() == second[j].get_x() &&
+                first[i].get_y() == second[j].get_y()) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+template <typename T>
 void test_convex_hull_case(
     const std::string& name,
     const std::vector<Punto<T>>& cloud,
     const std::vector<Punto<T>>& expected
 ) {
     IncrementalAlgorithm<T> incremental;
-    RandomIncrementalAlgorithm<T> random_incremental;
-
     const Poligono<T> expected_hull = incremental.apply(cloud);
     assert(tiene_mismos_vertices(expected_hull, expected));
 
     // El algoritmo aleatorio puede producir un orden de inserción distinto;
     // repetir la prueba verifica que cada permutación conserva la misma hull.
     for (int attempt = 0; attempt < 5; ++attempt) {
+        RandomIncrementalAlgorithm<T> random_incremental(
+            static_cast<unsigned int>(20261022 + attempt)
+        );
         const Poligono<T> actual_hull = random_incremental.apply(cloud);
         assert(tiene_mismos_vertices(actual_hull, expected));
     }
@@ -276,6 +305,76 @@ void test_convex_hull_algorithms() {
     std::cout << "[OK] Todos los tests de cerradura convexa pasaron.\n\n";
 }
 
+void test_randomized_convex_hulls() {
+    std::mt19937 generator(20261022U);
+    std::uniform_int_distribution<int> coordinate(-100, 100);
+    IncrementalAlgorithm<int> incremental;
+    RandomIncrementalAlgorithm<int> random_default_seed;
+    const std::vector<Punto<int>> default_seed_cloud = {
+        {0, 0}, {4, 0}, {4, 3}, {0, 3}, {2, 1}
+    };
+    Poligono<int> default_seed_hull = random_default_seed.apply(default_seed_cloud);
+    assert(tiene_mismos_vertices(
+        default_seed_hull,
+        std::vector<Punto<int>>{{0, 0}, {4, 0}, {4, 3}, {0, 3}}
+    ));
+
+    for (int case_index = 0; case_index < 100; ++case_index) {
+        std::vector<Punto<int>> cloud;
+        for (int point_index = 0; point_index < 30; ++point_index) {
+            cloud.emplace_back(coordinate(generator), coordinate(generator));
+        }
+        if (case_index % 2 == 0) {
+            cloud.push_back(cloud.front());
+        }
+
+        const Poligono<int> expected_hull = incremental.apply(cloud);
+        for (unsigned int seed = 0; seed < 5; ++seed) {
+            RandomIncrementalAlgorithm<int> random_incremental(
+                8675309U + static_cast<unsigned int>(case_index) * 5U + seed
+            );
+            Poligono<int> actual_hull = random_incremental.apply(cloud);
+            assert(tiene_mismos_vertices(actual_hull, expected_hull));
+            assert(actual_hull.size() < 3 || actual_hull.es_ccw());
+        }
+    }
+
+    std::cout << "[OK] 500 ejecuciones con semillas distintas contra el algoritmo incremental.\n";
+}
+
+template <typename T>
+void test_cloud_generator_strategies() {
+    std::mt19937 generator(141422U);
+    const UniformPointCloudGenerator<T> uniform;
+    const std::vector<Punto<T>> uniform_cloud = uniform.generate(100, generator);
+    assert(uniform_cloud.size() == 100);
+
+    const BoundaryInteriorPointCloudGenerator<T> strict(
+        10.0, BoundaryShape::StrictlyConvex
+    );
+    const std::vector<Punto<T>> strict_cloud = strict.generate(100, generator);
+    assert(strict_cloud.size() == 100);
+    const Poligono<T> strict_hull = IncrementalAlgorithm<T>().apply(strict_cloud);
+    assert(strict_hull.size() == 10);
+
+    const BoundaryInteriorPointCloudGenerator<T> collinear(
+        10.0, BoundaryShape::CollinearSides
+    );
+    const std::vector<Punto<T>> collinear_cloud =
+        collinear.generate(100, generator);
+    assert(collinear_cloud.size() == 100);
+    const Poligono<T> collinear_hull =
+        IncrementalAlgorithm<T>().apply(collinear_cloud);
+    assert(collinear_hull.size() < 10);
+    assert(collinear_hull.size() >= 4);
+}
+
+void test_cloud_generator_strategies() {
+    test_cloud_generator_strategies<double>();
+    test_cloud_generator_strategies<long long>();
+    std::cout << "[OK] Estrategias de generación real/entera y fronteras colineales/convexas.\n";
+}
+
 int main() {
     
     test_punto();
@@ -285,6 +384,8 @@ int main() {
     test_poligono();
     std::cout << "[OK] Todos los tests de POLIGONO pasaron exitosamente.\n\n";
     test_convex_hull_algorithms();
+    test_randomized_convex_hulls();
+    test_cloud_generator_strategies();
     std::cout << "Todos los tests pasaron exitosamente.\n";
     return 0;
 }

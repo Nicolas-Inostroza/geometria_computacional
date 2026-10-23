@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1150 1060" role="img" aria-labelledby="title description">
+  <title id="title">Comparación de tiempos de los algoritmos de cerradura convexa</title>
+  <desc id="description">Tres gráficos: tiempo según porcentaje de puntos en una frontera estrictamente convexa para n igual a diez mil, tiempos en nubes uniformes al crecer n y tiempos en fronteras con lados colineales.</desc>
+  <style>
+    text { font-family: Arial, Helvetica, sans-serif; fill: #202124; }
+    .title { font-size: 22px; font-weight: 700; }
+    .subtitle { font-size: 14px; fill: #4b5563; }
+    .panel-title { font-size: 17px; font-weight: 700; }
+    .axis-label { font-size: 13px; }
+    .tick { font-size: 12px; fill: #4b5563; }
+    .grid { stroke: #d9dee7; stroke-width: 1; }
+    .axis { stroke: #4b5563; stroke-width: 1.3; }
+    .legend { font-size: 12px; }
+    .real-inc { stroke: #2563eb; fill: #2563eb; }
+    .real-random { stroke: #dc2626; fill: #dc2626; }
+    .int-inc { stroke: #059669; fill: #059669; }
+    .int-random { stroke: #9333ea; fill: #9333ea; }
+    .line { fill: none; stroke-width: 2.7; stroke-linejoin: round; stroke-linecap: round; }
+    .point { stroke: #fff; stroke-width: 1.5; }
+  </style>
+
+  <rect width="1150" height="1060" fill="#fff"/>
+  <text x="575" y="32" text-anchor="middle" class="title">¿Qué algoritmo conviene según la nube de puntos?</text>
+  <text x="575" y="54" text-anchor="middle" class="subtitle">Promedio de 5 ejecuciones · g++ -O2 · semilla 20261022 · tiempo en ms</text>
+
+  <text x="62" y="85" class="panel-title">A. Frontera estrictamente convexa · n = 10 000</text>
+  <text x="62" y="105" class="subtitle">Ambos ejes son logarítmicos. Al aumentar los vértices extremos, crece el costo del random incremental.</text>
+
+  <line x1="100" y1="120" x2="1010" y2="120" class="grid"/>
+  <line x1="100" y1="157" x2="1010" y2="157" class="grid"/>
+  <line x1="100" y1="277" x2="1010" y2="277" class="grid"/>
+  <line x1="100" y1="397" x2="1010" y2="397" class="grid"/>
+  <line x1="100" y1="460" x2="1010" y2="460" class="grid"/>
+  <line x1="100" y1="120" x2="100" y2="460" class="axis"/>
+  <line x1="100" y1="460" x2="1010" y2="460" class="axis"/>
+  <text x="88" y="124" text-anchor="end" class="tick">200</text>
+  <text x="88" y="161" text-anchor="end" class="tick">100</text>
+  <text x="88" y="281" text-anchor="end" class="tick">10</text>
+  <text x="88" y="401" text-anchor="end" class="tick">1</text>
+  <text x="88" y="464" text-anchor="end" class="tick">0.3</text>
+  <text x="34" y="290" transform="rotate(-90 34 290)" text-anchor="middle" class="axis-label">Tiempo promedio (ms, escala logarítmica)</text>
+
+  <polyline points="100,422.4 156.3,418.7 196.3,422.2 252.6,414.9 323.6,417 419.8,422.2 739.7,419.6 1010,424.4" class="line real-inc"/>
+  <polyline points="100,429.5 156.3,432.1 196.3,429.6 252.6,433.2 323.6,419.5 419.8,392.8 739.7,281.1 1010,148.5" class="line real-random"/>
+  <polyline points="100,443.9 156.3,443.2 196.3,433.3 252.6,432.8 323.6,430.2 419.8,419.7 739.7,425.8 1010,428.4" class="line int-inc"/>
+  <polyline points="100,439.6 156.3,445.6 196.3,436.7 252.6,423.2 323.6,413.9 419.8,377.9 739.7,278.2 1010,151.2" class="line int-random"/>
+
+  <g class="real-inc">
+    <circle cx="100" cy="422.4" r="4" class="point"/><circle cx="156.3" cy="418.7" r="4" class="point"/>
+    <circle cx="196.3" cy="422.2" r="4" class="point"/><circle cx="252.6" cy="414.9" r="4" class="point"/>
+    <circle cx="323.6" cy="417" r="4" class="point"/><circle cx="419.8" cy="422.2" r="4" class="point"/>
+    <circle cx="739.7" cy="419.6" r="4" class="point"/><circle cx="1010" cy="424.4" r="4" class="point"/>
+  </g>
+  <g class="real-random">
+    <circle cx="100" cy="429.5" r="4" class="point"/><circle cx="156.3" cy="432.1" r="4" class="point"/>
+    <circle cx="196.3" cy="429.6" r="4" class="point"/><circle cx="252.6" cy="433.2" r="4" class="point"/>
+    <circle cx="323.6" cy="419.5" r="4" class="point"/><circle cx="419.8" cy="392.8" r="4" class="point"/>
+    <circle cx="739.7" cy="281.1" r="4" class="point"/><circle cx="1010" cy="148.5" r="4" class="point"/>
+  </g>
+  <g class="int-inc">
+    <circle cx="100" cy="443.9" r="4" class="point"/><circle cx="156.3" cy="443.2" r="4" class="point"/>
+    <circle cx="196.3" cy="433.3" r="4" class="point"/><circle cx="252.6" cy="432.8" r="4" class="point"/>
+    <circle cx="323.6" cy="430.2" r="4" class="point"/><circle cx="419.8" cy="419.7" r="4" class="point"/>
+    <circle cx="739.7" cy="425.8" r="4" class="point"/><circle cx="1010" cy="428.4" r="4" class="point"/>
+  </g>
+  <g class="int-random">
+    <circle cx="100" cy="439.6" r="4" class="point"/><circle cx="156.3" cy="445.6" r="4" class="point"/>
+    <circle cx="196.3" cy="436.7" r="4" class="point"/><circle cx="252.6" cy="423.2" r="4" class="point"/>
+    <circle cx="323.6" cy="413.9" r="4" class="point"/><circle cx="419.8" cy="377.9" r="4" class="point"/>
+    <circle cx="739.7" cy="278.2" r="4" class="point"/><circle cx="1010" cy="151.2" r="4" class="point"/>
+  </g>
+
+  <g class="tick" text-anchor="middle">
+    <text x="100" y="480">0.1%</text><text x="156.3" y="480">0.15%</text>
+    <text x="196.3" y="480">0.2%</text><text x="252.6" y="480">0.3%</text>
+    <text x="323.6" y="480">0.5%</text><text x="419.8" y="480">1%</text>
+    <text x="739.7" y="480">10%</text><text x="1010" y="480">70%</text>
+  </g>
+  <text x="555" y="503" text-anchor="middle" class="axis-label">Porcentaje de puntos extremos de la frontera (escala logarítmica)</text>
+
+  <g class="legend">
+    <line x1="245" y1="532" x2="270" y2="532" class="line real-inc"/><text x="277" y="536">Real · incremental</text>
+    <line x1="430" y1="532" x2="455" y2="532" class="line real-random"/><text x="462" y="536">Real · random incremental</text>
+    <line x1="690" y1="532" x2="715" y2="532" class="line int-inc"/><text x="722" y="536">Entero · incremental</text>
+    <line x1="890" y1="532" x2="915" y2="532" class="line int-random"/><text x="922" y="536">Entero · random</text>
+  </g>
+
+  <line x1="55" y1="560" x2="1095" y2="560" stroke="#cbd5e1"/>
+  <text x="62" y="590" class="panel-title">B. Nubes uniformes · tiempo al aumentar n</text>
+  <text x="62" y="610" class="subtitle">Ambos ejes logarítmicos. La ventaja es pequeña y cambia según el tipo de coordenadas.</text>
+
+  <line x1="100" y1="710" x2="540" y2="710" class="grid"/>
+  <line x1="100" y1="770" x2="540" y2="770" class="grid"/>
+  <line x1="100" y1="830" x2="540" y2="830" class="grid"/>
+  <line x1="100" y1="900" x2="540" y2="900" class="grid"/>
+  <line x1="100" y1="710" x2="100" y2="900" class="axis"/>
+  <line x1="100" y1="900" x2="540" y2="900" class="axis"/>
+  <text x="90" y="714" text-anchor="end" class="tick">100</text>
+  <text x="90" y="774" text-anchor="end" class="tick">10</text>
+  <text x="90" y="834" text-anchor="end" class="tick">1</text>
+  <text x="90" y="904" text-anchor="end" class="tick">0.3</text>
+  <text x="69" y="805" transform="rotate(-90 69 805)" text-anchor="middle" class="axis-label">Tiempo (ms)</text>
+  <polyline points="130,875.3 320,793.9 510,713.7" class="line real-inc"/>
+  <polyline points="130,878.4 320,799.5 510,718" class="line real-random"/>
+  <polyline points="130,881.8 320,801.9 510,720.7" class="line int-inc"/>
+  <polyline points="130,874.9 320,800.2 510,718.1" class="line int-random"/>
+  <g class="real-inc"><circle cx="130" cy="875.3" r="4" class="point"/><circle cx="320" cy="793.9" r="4" class="point"/><circle cx="510" cy="713.7" r="4" class="point"/></g>
+  <g class="real-random"><circle cx="130" cy="878.4" r="4" class="point"/><circle cx="320" cy="799.5" r="4" class="point"/><circle cx="510" cy="718" r="4" class="point"/></g>
+  <g class="int-inc"><circle cx="130" cy="881.8" r="4" class="point"/><circle cx="320" cy="801.9" r="4" class="point"/><circle cx="510" cy="720.7" r="4" class="point"/></g>
+  <g class="int-random"><circle cx="130" cy="874.9" r="4" class="point"/><circle cx="320" cy="800.2" r="4" class="point"/><circle cx="510" cy="718.1" r="4" class="point"/></g>
+  <g class="tick" text-anchor="middle"><text x="130" y="922">10⁴</text><text x="320" y="922">10⁵</text><text x="510" y="922">10⁶</text></g>
+  <text x="320" y="945" text-anchor="middle" class="axis-label">Cantidad de puntos n</text>
+
+  <g class="legend">
+    <line x1="110" y1="967" x2="132" y2="967" class="line real-inc"/><text x="139" y="971">Real · incremental</text>
+    <line x1="280" y1="967" x2="302" y2="967" class="line real-random"/><text x="309" y="971">Real · random</text>
+    <line x1="110" y1="990" x2="132" y2="990" class="line int-inc"/><text x="139" y="994">Entero · incremental</text>
+    <line x1="280" y1="990" x2="302" y2="990" class="line int-random"/><text x="309" y="994">Entero · random</text>
+  </g>
+
+  <text x="650" y="590" class="panel-title">C. Frontera con lados colineales · n = 10 000</text>
+  <text x="650" y="610" class="subtitle">El porcentaje de puntos sobre el borde no aumenta los vértices extremos (h = 4).</text>
+  <line x1="700" y1="700" x2="1090" y2="700" class="grid"/>
+  <line x1="700" y1="750" x2="1090" y2="750" class="grid"/>
+  <line x1="700" y1="800" x2="1090" y2="800" class="grid"/>
+  <line x1="700" y1="850" x2="1090" y2="850" class="grid"/>
+  <line x1="700" y1="900" x2="1090" y2="900" class="grid"/>
+  <line x1="700" y1="700" x2="700" y2="900" class="axis"/>
+  <line x1="700" y1="900" x2="1090" y2="900" class="axis"/>
+  <text x="690" y="704" text-anchor="end" class="tick">0.8</text>
+  <text x="690" y="754" text-anchor="end" class="tick">0.6</text>
+  <text x="690" y="804" text-anchor="end" class="tick">0.4</text>
+  <text x="690" y="854" text-anchor="end" class="tick">0.2</text>
+  <text x="690" y="904" text-anchor="end" class="tick">0</text>
+  <text x="658" y="800" transform="rotate(-90 658 800)" text-anchor="middle" class="axis-label">Tiempo (ms)</text>
+  <rect x="730" y="728.3" width="26" height="171.7" fill="#2563eb"/>
+  <rect x="759" y="825.5" width="26" height="74.5" fill="#dc2626"/>
+  <rect x="820" y="798.3" width="26" height="101.7" fill="#2563eb"/>
+  <rect x="849" y="825.0" width="26" height="75.0" fill="#dc2626"/>
+  <rect x="930" y="760.2" width="26" height="139.8" fill="#2563eb"/>
+  <rect x="959" y="830.5" width="26" height="69.5" fill="#dc2626"/>
+  <rect x="1020" y="815.3" width="26" height="84.7" fill="#2563eb"/>
+  <rect x="1049" y="827.8" width="26" height="72.2" fill="#dc2626"/>
+  <g class="tick" text-anchor="middle">
+    <text x="757" y="922">Real 10%</text><text x="847" y="942">Real 70%</text>
+    <text x="947" y="922">Entero 10%</text><text x="1037" y="942">Entero 70%</text>
+  </g>
+  <g class="legend">
+    <rect x="790" y="967" width="12" height="12" fill="#2563eb"/><text x="808" y="978">Incremental</text>
+    <rect x="930" y="967" width="12" height="12" fill="#dc2626"/><text x="948" y="978">Random incremental</text>
+  </g>
+  <text x="575" y="1030" text-anchor="middle" class="subtitle">Fuentes y resultados exactos: resultados_experimento.csv · se comparan los vértices de ambas cerraduras en cada repetición.</text>
+</svg>
