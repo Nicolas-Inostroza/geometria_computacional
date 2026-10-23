@@ -23,14 +23,13 @@ El número de puntos en la frontera se redondea al entero más cercano. En la pa
 
 ## Protocolo experimental
 
-- Compilador: `g++ 15.2.0`, C++17, opciones `-O2
-- Procesador AMD Ryzen 7 9700X.
-- Memoria RAM: 32GB DDR5
+- Compilador: `g++ 15.2.0`, C++17, opciones `-O2 -Wall -Wextra`.
+- Procesador: AMD Ryzen 7 9700X.
+- Memoria RAM: 32 GB DDR5.
 - Tamaños: `n = 10 000`, `100 000`, `1 000 000` y `10 000 000`.
 - Cinco repeticiones por escenario, con semilla maestra `20261022`; las nubes se generan antes de cronometrar. Cada algoritmo recibe la misma nube y se usa una semilla aleatoria reproducible por ejecución del algoritmo aleatorizado.
 - Se comparan coordenadas `double` y `long long`, y se verifica en cada repetición que ambos algoritmos devuelvan el mismo conjunto de vértices. Si difieren, el experimento falla.
-- En `n = 10 000` se probaron fronteras estrictamente convexas de `0.1 %`, `0.15 %`, `0.2 %`, `0.3 %`, `0.5 %`, `1 %`, `10 %` y `70 %`
- Además, fronteras con lados colineales de `10 %` y `70 %`.
+- En `n = 10 000` se probaron fronteras estrictamente convexas de `0.1 %`, `0.15 %`, `0.2 %`, `0.3 %`, `0.5 %`, `1 %`, `10 %` y `70 %`; además, fronteras con lados colineales de `10 %` y `70 %`.
 - En `n = 100 000`, se probaron fronteras estrictamente convexas de `0.1 %` y `1 %`; en `n = 1 000 000`, `0.01 %`; y en `n = 10 000 000`, `0.001 %`. Los dos últimos porcentajes mantienen una frontera de 100 vértices para comparar el crecimiento con el tamaño de la nube. Se reduce la cantidad de porcentajes al aumentar `n` porque el costo del algoritmo random incremental crece con el número de vértices de la frontera.
 
 Los tiempos reportados son promedios en milisegundos. Los resultados completos por escenario están en [resultados_experimento.csv](./resultados_experimento.csv).
@@ -100,4 +99,3 @@ Los puntos intermedios colineales de cada lado pertenecen al borde geométrico, 
 ## Conclusión y limitaciones
 
 En distribuciones uniformes que producen una cerradura pequeña, ambos métodos tienen tiempos comparables y las mediciones no dan un ganador robusto; a `n = 10^7` ambos tardaron alrededor de un segundo. Si se espera que una parte apreciable de la entrada forme una frontera estrictamente convexa, conviene el algoritmo incremental por ordenamiento: su tiempo se mantuvo cercano a `O(n log n)`, mientras que el random incremental revisa la frontera en cada inserción y puede acercarse a `O(nh)` (`h` es el número de vértices), con degradación marcada incluso manteniendo 100 vértices al aumentar `n`.
-

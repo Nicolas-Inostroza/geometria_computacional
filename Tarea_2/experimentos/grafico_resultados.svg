@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1150 1060" role="img" aria-labelledby="title description">
+<svg xmlns="http://www.w3.org/2000/svg" width="1150" height="1060" viewBox="0 0 1150 1060" role="img" aria-labelledby="title description">
   <title id="title">Comparación de tiempos de los algoritmos de cerradura convexa</title>
   <desc id="description">Tres gráficos: tiempo según porcentaje de puntos en una frontera estrictamente convexa para n igual a diez mil, tiempos en nubes uniformes al crecer n y tiempos en fronteras con lados colineales.</desc>
   <style>
