@@ -26,30 +26,30 @@ template <typename T>
 using Cloud = std::vector<Punto<T>>;
 
 template <typename T>
-bool same_hull_vertices(const Poligono<T>& first, const Poligono<T>& second) {
-    if (first.size() != second.size()) {
+bool same_hull_vertices(const Poligono<T>& primero, const Poligono<T>& segundo) {
+    if (primero.size() != segundo.size()) {
         return false;
     }
 
-    std::vector<std::pair<T, T>> first_vertices;
-    std::vector<std::pair<T, T>> second_vertices;
-    first_vertices.reserve(first.size());
-    second_vertices.reserve(second.size());
+    std::vector<std::pair<T, T>> vertice_primer_poligono;
+    std::vector<std::pair<T, T>> vertice_segundo_poligono;
+    vertice_primer_poligono.reserve(primero.size());
+    vertice_segundo_poligono.reserve(segundo.size());
 
-    for (int i = 0; i < first.size(); ++i) {
-        first_vertices.emplace_back(first[i].get_x(), first[i].get_y());
-        second_vertices.emplace_back(second[i].get_x(), second[i].get_y());
+    for (int i = 0; i < primero.size(); ++i) {
+        vertice_primer_poligono.emplace_back(primero[i].get_x(), primero[i].get_y());
+        vertice_segundo_poligono.emplace_back(segundo[i].get_x(), segundo[i].get_y());
     }
 
-    const auto by_coordinates = [](const auto& a, const auto& b) {
-        if (a.first != b.first) {
-            return a.first < b.first;
+    const auto por_coordenada = [](const auto& a, const auto& b) {
+        if (a.primero != b.primero) {
+            return a.primero < b.primero;
         }
-        return a.second < b.second;
+        return a.segundo < b.segundo;
     };
-    std::sort(first_vertices.begin(), first_vertices.end(), by_coordinates);
-    std::sort(second_vertices.begin(), second_vertices.end(), by_coordinates);
-    return first_vertices == second_vertices;
+    std::sort(vertice_primer_poligono.begin(), vertice_primer_poligono.end(), por_coordenada);
+    std::sort(vertice_segundo_poligono.begin(), vertice_segundo_poligono.end(), por_coordenada);
+    return vertice_primer_poligono == vertice_segundo_poligono;
 }
 
 double average_milliseconds(const std::vector<double>& measurements) {
