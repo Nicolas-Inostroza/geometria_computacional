@@ -1,8 +1,8 @@
 #include "../tarea1/punto.cpp"
 #include "../tarea1/vector.cpp"
 #include "../tarea1/poligono.cpp"
-#include "../algorithms/incrementalalgorithm.hpp"
-#include "../algorithms/randomincrementalalgorithm.hpp"
+#include "../algorithmos/incrementalalgorithm.hpp"
+#include "../algorithmos/randomincrementalalgorithm.hpp"
 #include "pointcloudgenerator.hpp"
 #include <algorithm>
 #include <cassert>
@@ -346,13 +346,13 @@ template <typename T>
 void test_cloud_generator_strategies() {
     std::mt19937 generator(141422U);
     const UniformPointCloudGenerator<T> uniform;
-    const std::vector<Punto<T>> uniform_cloud = uniform.generate(100, generator);
+    const std::vector<Punto<T>> uniform_cloud = uniform.generar(100, generator);
     assert(uniform_cloud.size() == 100);
 
     const BoundaryInteriorPointCloudGenerator<T> strict(
         10.0, BoundaryShape::StrictlyConvex
     );
-    const std::vector<Punto<T>> strict_cloud = strict.generate(100, generator);
+    const std::vector<Punto<T>> strict_cloud = strict.generar(100, generator);
     assert(strict_cloud.size() == 100);
     const Poligono<T> strict_hull = IncrementalAlgorithm<T>().apply(strict_cloud);
     assert(strict_hull.size() == 10);
@@ -361,7 +361,7 @@ void test_cloud_generator_strategies() {
         10.0, BoundaryShape::CollinearSides
     );
     const std::vector<Punto<T>> collinear_cloud =
-        collinear.generate(100, generator);
+        collinear.generar(100, generator);
     assert(collinear_cloud.size() == 100);
     const Poligono<T> collinear_hull =
         IncrementalAlgorithm<T>().apply(collinear_cloud);

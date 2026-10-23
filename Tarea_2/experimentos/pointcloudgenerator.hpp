@@ -19,50 +19,57 @@ template <typename T>
 class PointCloudGenerator {
 public:
     virtual ~PointCloudGenerator() = default;
-    virtual std::vector<Punto<T>> generate(
-        std::size_t count,
-        std::mt19937& generator
+    // Interfaz común para generar nubes y describir el escenario utilizado.
+    virtual std::vector<Punto<T>> generar(
+        std::size_t cantidad_puntos,
+        std::mt19937& generador
     ) const = 0;
-    virtual std::string name() const = 0;
-    virtual double boundary_percentage() const = 0;
+    virtual std::string nombre() const = 0;
+    virtual double porcentaje_frontera() const = 0;
 };
 
 template <typename T>
 class UniformPointCloudGenerator : public PointCloudGenerator<T> {
 public:
-    std::vector<Punto<T>> generate(
-        std::size_t count,
-        std::mt19937& generator
+    // Genera puntos independientes y uniformes en un cuadrado.
+    std::vector<Punto<T>> generar(
+        std::size_t cantidad_puntos,
+        std::mt19937& generador
     ) const override {
-        std::vector<Punto<T>> cloud;
-        cloud.reserve(count);
+        std::vector<Punto<T>> nube;
+        nube.reserve(cantidad_puntos);
 
+        // El rango depende del tipo para conservar precisión en reales.
         if constexpr (std::is_integral<T>::value) {
-            std::uniform_int_distribution<long long> coordinate(-1000000, 1000000);
-            for (std::size_t i = 0; i < count; ++i) {
-                cloud.emplace_back(
-                    static_cast<T>(coordinate(generator)),
-                    static_cast<T>(coordinate(generator))
+            std::uniform_int_distribution<long long> distribucion_coordenadas(
+                -1000000, 1000000
+            );
+            for (std::size_t indice = 0; indice < cantidad_puntos; ++indice) {
+                nube.emplace_back(
+                    static_cast<T>(distribucion_coordenadas(generador)),
+                    static_cast<T>(distribucion_coordenadas(generador))
                 );
             }
         } else {
-            std::uniform_real_distribution<double> coordinate(-1.0, 1.0);
-            for (std::size_t i = 0; i < count; ++i) {
-                cloud.emplace_back(
-                    static_cast<T>(coordinate(generator)),
-                    static_cast<T>(coordinate(generator))
+            std::uniform_real_distribution<double> distribucion_coordenadas(
+                -1.0, 1.0
+            );
+            for (std::size_t indice = 0; indice < cantidad_puntos; ++indice) {
+                nube.emplace_back(
+                    static_cast<T>(distribucion_coordenadas(generador)),
+                    static_cast<T>(distribucion_coordenadas(generador))
                 );
             }
         }
 
-        return cloud;
+        return nube;
     }
 
-    std::string name() const override {
+    std::string nombre() const override {
         return std::is_integral<T>::value ? "uniforme_entero" : "uniforme_real";
     }
 
-    double boundary_percentage() const override {
+    double porcentaje_frontera() const override {
         return 0.0;
     }
 };
@@ -70,204 +77,212 @@ public:
 template <typename T>
 class BoundaryInteriorPointCloudGenerator : public PointCloudGenerator<T> {
 private:
-    double percentage;
-    BoundaryShape shape;
+    double porcentaje;
+    BoundaryShape forma_frontera;
 
-    static T convert_coordinate(double value) {
+    static T convertir_coordenada(double valor) {
         if constexpr (std::is_integral<T>::value) {
-            return static_cast<T>(std::llround(value));
+            return static_cast<T>(std::llround(valor));
         } else {
-            return static_cast<T>(value);
+            return static_cast<T>(valor);
         }
     }
 
-    void append_collinear_boundary(
-        std::vector<Punto<T>>& cloud,
-        std::size_t boundary_count
+    void agregar_frontera_lados_colineales(
+        std::vector<Punto<T>>& nube,
+        std::size_t cantidad_frontera
     ) const {
-        const double extent = std::is_integral<T>::value
-            ? static_cast<double>(boundary_count + 1)
+        const double extension = std::is_integral<T>::value
+            ? static_cast<double>(cantidad_frontera + 1)
             : 1.0;
 
-        for (std::size_t i = 0; i < boundary_count; ++i) {
-            const double position =
-                4.0 * static_cast<double>(i) / boundary_count;
-            const int side = static_cast<int>(position);
-            const double fraction = position - side;
-            const double coordinate = (2.0 * fraction - 1.0) * extent;
+        // Distribuye los puntos de frontera a lo largo de los cuatro lados.
+        for (std::size_t indice = 0; indice < cantidad_frontera; ++indice) {
+            const double posicion =
+                4.0 * static_cast<double>(indice) / cantidad_frontera;
+            const int lado = static_cast<int>(posicion);
+            const double fraccion = posicion - lado;
+            const double coordenada = (2.0 * fraccion - 1.0) * extension;
 
-            switch (side) {
+            switch (lado) {
                 case 0:
-                    cloud.emplace_back(
-                        convert_coordinate(-extent),
-                        convert_coordinate(coordinate)
+                    nube.emplace_back(
+                        convertir_coordenada(-extension),
+                        convertir_coordenada(coordenada)
                     );
                     break;
                 case 1:
-                    cloud.emplace_back(
-                        convert_coordinate(coordinate),
-                        convert_coordinate(extent)
+                    nube.emplace_back(
+                        convertir_coordenada(coordenada),
+                        convertir_coordenada(extension)
                     );
                     break;
                 case 2:
-                    cloud.emplace_back(
-                        convert_coordinate(extent),
-                        convert_coordinate(-coordinate)
+                    nube.emplace_back(
+                        convertir_coordenada(extension),
+                        convertir_coordenada(-coordenada)
                     );
                     break;
                 default:
-                    cloud.emplace_back(
-                        convert_coordinate(-coordinate),
-                        convert_coordinate(-extent)
+                    nube.emplace_back(
+                        convertir_coordenada(-coordenada),
+                        convertir_coordenada(-extension)
                     );
                     break;
             }
         }
     }
 
-    void append_strictly_convex_boundary(
-        std::vector<Punto<T>>& cloud,
-        std::size_t boundary_count,
-        std::mt19937& generator
+    void agregar_frontera_estrictamente_convexa(
+        std::vector<Punto<T>>& nube,
+        std::size_t cantidad_frontera,
+        std::mt19937& generador
     ) const {
         if constexpr (std::is_integral<T>::value) {
-            for (std::size_t i = 0; i < boundary_count; ++i) {
-                const long long x = static_cast<long long>(i);
-                cloud.emplace_back(static_cast<T>(x), static_cast<T>(x * x));
+            // La parábola discreta produce una frontera estrictamente convexa.
+            for (std::size_t indice = 0; indice < cantidad_frontera; ++indice) {
+                const long long coordenada_x = static_cast<long long>(indice);
+                nube.emplace_back(
+                    static_cast<T>(coordenada_x),
+                    static_cast<T>(coordenada_x * coordenada_x)
+                );
             }
         } else {
             const double pi = std::acos(-1.0);
-            std::uniform_real_distribution<double> rotation_distribution(
+            std::uniform_real_distribution<double> distribucion_rotacion(
                 0.0, 2.0 * pi
             );
-            const double rotation = rotation_distribution(generator);
-            for (std::size_t i = 0; i < boundary_count; ++i) {
-                const double angle = rotation +
-                    2.0 * pi * static_cast<double>(i) / boundary_count;
-                cloud.emplace_back(
-                    static_cast<T>(std::cos(angle)),
-                    static_cast<T>(std::sin(angle))
+            const double rotacion = distribucion_rotacion(generador);
+            for (std::size_t indice = 0; indice < cantidad_frontera; ++indice) {
+                const double angulo = rotacion +
+                    2.0 * pi * static_cast<double>(indice) / cantidad_frontera;
+                nube.emplace_back(
+                    static_cast<T>(std::cos(angulo)),
+                    static_cast<T>(std::sin(angulo))
                 );
             }
         }
     }
 
-    void append_interior_points(
-        std::vector<Punto<T>>& cloud,
-        std::size_t boundary_count,
-        std::size_t interior_count,
-        std::mt19937& generator
+    void agregar_puntos_interiores(
+        std::vector<Punto<T>>& nube,
+        std::size_t cantidad_frontera,
+        std::size_t cantidad_interior,
+        std::mt19937& generador
     ) const {
-        if (interior_count == 0) {
+        if (cantidad_interior == 0) {
             return;
         }
 
-        if (shape == BoundaryShape::StrictlyConvex &&
+        // La distribución interior depende de la forma y del tipo de frontera.
+        if (forma_frontera == BoundaryShape::StrictlyConvex &&
             std::is_integral<T>::value) {
-            if (boundary_count < 4) {
+            if (cantidad_frontera < 4) {
                 throw std::invalid_argument(
                     "La frontera entera estrictamente convexa requiere "
                     "al menos cuatro puntos"
                 );
             }
 
-            const long long last_x =
-                static_cast<long long>(boundary_count - 1);
-            std::uniform_int_distribution<long long> x_distribution(
-                1, last_x - 1
+            const long long ultimo_x =
+                static_cast<long long>(cantidad_frontera - 1);
+            std::uniform_int_distribution<long long> distribucion_x(
+                1, ultimo_x - 1
             );
-            for (std::size_t i = 0; i < interior_count; ++i) {
-                const long long x = x_distribution(generator);
-                const long long lower = x * x;
-                const long long upper = last_x * x;
-                std::uniform_int_distribution<long long> y_distribution(
-                    lower + 1, upper - 1
+            for (std::size_t indice = 0; indice < cantidad_interior; ++indice) {
+                const long long coordenada_x = distribucion_x(generador);
+                const long long limite_inferior = coordenada_x * coordenada_x;
+                const long long limite_superior = ultimo_x * coordenada_x;
+                std::uniform_int_distribution<long long> distribucion_y(
+                    limite_inferior + 1, limite_superior - 1
                 );
-                cloud.emplace_back(
-                    static_cast<T>(x),
-                    static_cast<T>(y_distribution(generator))
+                nube.emplace_back(
+                    static_cast<T>(coordenada_x),
+                    static_cast<T>(distribucion_y(generador))
                 );
             }
             return;
         }
 
-        if (shape == BoundaryShape::StrictlyConvex) {
+        if (forma_frontera == BoundaryShape::StrictlyConvex) {
             const double pi = std::acos(-1.0);
-            std::uniform_real_distribution<double> angle_distribution(
+            std::uniform_real_distribution<double> distribucion_angulos(
                 0.0, 2.0 * pi
             );
-            std::uniform_real_distribution<double> radius_distribution(0.0, 1.0);
-            for (std::size_t i = 0; i < interior_count; ++i) {
-                const double angle = angle_distribution(generator);
-                const double radius =
-                    0.8 * std::sqrt(radius_distribution(generator));
-                cloud.emplace_back(
-                    static_cast<T>(radius * std::cos(angle)),
-                    static_cast<T>(radius * std::sin(angle))
+            std::uniform_real_distribution<double> distribucion_radios(0.0, 1.0);
+            for (std::size_t indice = 0; indice < cantidad_interior; ++indice) {
+                const double angulo = distribucion_angulos(generador);
+                const double radio =
+                    0.8 * std::sqrt(distribucion_radios(generador));
+                nube.emplace_back(
+                    static_cast<T>(radio * std::cos(angulo)),
+                    static_cast<T>(radio * std::sin(angulo))
                 );
             }
             return;
         }
 
-        const double extent = std::is_integral<T>::value
-            ? static_cast<double>(boundary_count + 1)
+        const double extension = std::is_integral<T>::value
+            ? static_cast<double>(cantidad_frontera + 1)
             : 1.0;
-        std::uniform_real_distribution<double> coordinate(-0.5 * extent, 0.5 * extent);
-        for (std::size_t i = 0; i < interior_count; ++i) {
-            cloud.emplace_back(
-                convert_coordinate(coordinate(generator)),
-                convert_coordinate(coordinate(generator))
+        std::uniform_real_distribution<double> distribucion_coordenadas(
+            -0.5 * extension, 0.5 * extension
+        );
+        for (std::size_t indice = 0; indice < cantidad_interior; ++indice) {
+            nube.emplace_back(
+                convertir_coordenada(distribucion_coordenadas(generador)),
+                convertir_coordenada(distribucion_coordenadas(generador))
             );
         }
     }
 
 public:
     BoundaryInteriorPointCloudGenerator(
-        double boundary_percentage,
-        BoundaryShape boundary_shape
-    ) : percentage(boundary_percentage), shape(boundary_shape) {
-        if (percentage <= 0.0 || percentage > 100.0) {
+        double porcentaje_frontera,
+        BoundaryShape forma_frontera
+    ) : porcentaje(porcentaje_frontera), forma_frontera(forma_frontera) {
+        if (porcentaje <= 0.0 || porcentaje > 100.0) {
             throw std::invalid_argument(
                 "El porcentaje de frontera debe estar en (0, 100]"
             );
         }
     }
 
-    std::vector<Punto<T>> generate(
-        std::size_t count,
-        std::mt19937& generator
+    std::vector<Punto<T>> generar(
+        std::size_t cantidad_puntos,
+        std::mt19937& generador
     ) const override {
-        const std::size_t boundary_count = static_cast<std::size_t>(
-            std::llround(count * percentage / 100.0)
+        // Redondea el porcentaje para obtener una cantidad entera de puntos.
+        const std::size_t cantidad_frontera = static_cast<std::size_t>(
+            std::llround(cantidad_puntos * porcentaje / 100.0)
         );
-        const std::size_t interior_count = count - boundary_count;
-        std::vector<Punto<T>> cloud;
-        cloud.reserve(count);
+        const std::size_t cantidad_interior = cantidad_puntos - cantidad_frontera;
+        std::vector<Punto<T>> nube;
+        nube.reserve(cantidad_puntos);
 
-        if (shape == BoundaryShape::CollinearSides) {
-            append_collinear_boundary(cloud, boundary_count);
+        if (forma_frontera == BoundaryShape::CollinearSides) {
+            agregar_frontera_lados_colineales(nube, cantidad_frontera);
         } else {
-            append_strictly_convex_boundary(cloud, boundary_count, generator);
+            agregar_frontera_estrictamente_convexa(
+                nube, cantidad_frontera, generador
+            );
         }
-        append_interior_points(
-            cloud,
-            boundary_count,
-            interior_count,
-            generator
+        agregar_puntos_interiores(
+            nube, cantidad_frontera, cantidad_interior, generador
         );
-        return cloud;
+        return nube;
     }
 
-    std::string name() const override {
-        const char* coordinate_type =
+    std::string nombre() const override {
+        const char* tipo_coordenada =
             std::is_integral<T>::value ? "entero" : "real";
-        const char* shape_name = shape == BoundaryShape::CollinearSides
+        const char* nombre_forma = forma_frontera == BoundaryShape::CollinearSides
             ? "lados_colineales"
             : "frontera_estrictamente_convexa";
-        return std::string(coordinate_type) + "_" + shape_name;
+        return std::string(tipo_coordenada) + "_" + nombre_forma;
     }
 
-    double boundary_percentage() const override {
-        return percentage;
+    double porcentaje_frontera() const override {
+        return porcentaje;
     }
 };
