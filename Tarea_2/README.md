@@ -1,72 +1,58 @@
 # Tarea 2: Cerradura convexa
 
-Implementación de dos algoritmos para calcular la cerradura convexa a partir de las clases de puntos, vectores y polígonos de la Tarea 1.
+Implementación y comparación de dos algoritmos para calcular la cerradura convexa.
 
 ## Estructura
 
-- `punto.hpp` y `punto.cpp`: clase genérica para representar puntos.
-- `vector.hpp` y `vector.cpp`: clase genérica para representar vectores y realizar operaciones vectoriales.
-- `poligono.hpp` y `poligono.cpp`: clase genérica para representar polígonos, calcular su área y orientación.
-- `incrementalalgorithm.hpp` y `randomincrementalalgorithm.hpp`: estrategias de cerradura convexa.
-- `randomincremental.hpp`: encabezado de compatibilidad para el nombre anterior.
-- `pointcloudgenerator.hpp`: interfaz Strategy y generadores uniformes y con porcentaje configurable de puntos en la frontera.
-- `test.cpp`: pruebas de las clases de la Tarea 1 y de ambos algoritmos.
-- `main_experimento.cpp`: experimentos de tiempo y comparación de las cerraduras.
+- [`tarea1/`](./tarea1/): clases reutilizadas de la Tarea 1 (`Punto`, `Vector` y `Poligono`) y su enunciado.
+- [`algorithms/`](./algorithms/): interfaz `ConvexHullStrategy` y algoritmos incremental y random incremental.
+- [`experiments/`](./experiments/): generadores Strategy, pruebas, ejecutable de benchmarks, informe, gráfico y resultados CSV.
+- [`tarea2_CH.pdf`](./tarea2_CH.pdf): enunciado de la Tarea 2.
 
-## Tests
+## Pruebas
 
-Los tests se encuentran en `test.cpp`. Cubren `Punto`, `Vector`, `Poligono` y los dos algoritmos de cerradura convexa para diferentes tipos de coordenadas y casos geométricos. También comparan ambos algoritmos con 100 nubes generadas de forma reproducible y prueban cinco semillas por nube.
+Requiere un compilador compatible con C++17, como `g++`. Ejecuta los comandos desde esta carpeta:
 
-Se requiere un compilador compatible con C++17, como `g++`.
-
-## Ejecución
-
-Desde la carpeta del proyecto, compile el archivo de tests con:
-
-### Windows
+### Windows (PowerShell)
 
 ```powershell
-g++ -std=c++17 -Wall -Wextra test.cpp -o test.exe
+g++ -std=c++17 -Wall -Wextra experiments\test.cpp -o test.exe
 .\test.exe
 ```
 
 ### Linux/macOS
 
 ```bash
-g++ -std=c++17 -Wall -Wextra test.cpp -o test
+g++ -std=c++17 -Wall -Wextra experiments/test.cpp -o test
 ./test
 ```
 
+La suite cubre las clases geométricas, casos de cerradura para `int`, `float` y `double`, 500 permutaciones con semillas reproducibles y los generadores de puntos enteros/reales con fronteras colineales y estrictamente convexas.
+
 ## Experimentos
 
-El programa compara `double` y `long long` para tamaños `n = 10^4, 10^5, 10^6`:
+El ejecutable compara ambos algoritmos en nubes reales y enteras, para tamaños `n = 10^4, 10^5, 10^6`, diversos porcentajes de puntos en la frontera y dos formas de frontera. Cada repetición comprueba que ambos métodos devuelvan el mismo conjunto de vértices.
 
-- nube aleatoria uniforme;
-- nube con frontera estrictamente convexa en porcentajes desde 0.1 % hasta 70 % para `n = 10^4`, y porcentajes menores para tamaños mayores;
-- frontera con lados colineales para `n = 10^4`.
-
-En cada repetición mide ambos algoritmos sobre la misma nube, comprueba que devuelvan los mismos vértices y escribe los promedios en `resultados_experimento.csv`. Los generadores siguen `PointCloudGenerator<T>`, por lo que se pueden agregar nuevas distribuciones como estrategias.
-
-La implementación random incremental recibe una semilla opcional; el experimento deriva una semilla reproducible para cada repetición. Las hipótesis, el protocolo y los resultados de referencia están en [INFORME_EXPERIMENTAL.md](./INFORME_EXPERIMENTAL.md).
-
-### Windows
+### Windows (PowerShell)
 
 ```powershell
-g++ -std=c++17 -O2 -Wall -Wextra main_experimento.cpp -o experimento.exe
+g++ -std=c++17 -O2 -Wall -Wextra experiments\main_experimento.cpp -o experimento.exe
 .\experimento.exe
 ```
 
 ### Linux/macOS
 
 ```bash
-g++ -std=c++17 -O2 -Wall -Wextra main_experimento.cpp -o experimento
+g++ -std=c++17 -O2 -Wall -Wextra experiments/main_experimento.cpp -o experimento
 ./experimento
 ```
 
-Por defecto se prueban los exponentes 4 a 6, con 5 repeticiones. Se pueden indicar exponente máximo, repeticiones, archivo CSV y semilla:
+Por defecto ejecuta cinco repeticiones con semilla `20261022` y guarda los resultados en `experiments/resultados_experimento.csv`. Se pueden indicar exponente máximo, repeticiones, archivo CSV y semilla:
 
 ```text
 experimento [exponente_maximo] [repeticiones] [archivo.csv] [semilla]
 ```
 
-Por ejemplo, `experimento 6 5 resultados.csv 1234` ejecuta el experimento hasta `n = 10^6`. El algoritmo random incremental recorre la frontera en cada inserción, así que puede tardar considerablemente cuando muchos puntos son vértices extremos.
+Por ejemplo, `experimento 5 3 experiments/prueba.csv 1234` ejecuta los tamaños hasta `10^5`.
+
+El análisis de hipótesis, el protocolo y las conclusiones están en [`experiments/INFORME_EXPERIMENTAL.md`](./experiments/INFORME_EXPERIMENTAL.md), junto con el [gráfico](./experiments/grafico_resultados.svg) y los [datos completos](./experiments/resultados_experimento.csv).

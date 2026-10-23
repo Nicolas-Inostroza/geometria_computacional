@@ -1,6 +1,6 @@
 #pragma once
 
-#include "punto.hpp"
+#include "../tarea1/punto.hpp"
 #include <algorithm>
 #include <cmath>
 #include <cstddef>

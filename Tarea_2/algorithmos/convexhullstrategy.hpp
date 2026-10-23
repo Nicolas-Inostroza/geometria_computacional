@@ -1,7 +1,7 @@
 #pragma once
 
-#include "punto.hpp"
-#include "poligono.hpp"
+#include "../tarea1/punto.hpp"
+#include "../tarea1/poligono.hpp"
 #include <vector>
 
 template <typename T>

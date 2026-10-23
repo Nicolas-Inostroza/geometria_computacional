@@ -1,7 +1,7 @@
 #pragma once
 
 #include "convexhullstrategy.hpp"
-#include "vector.hpp"
+#include "../tarea1/vector.hpp"
 #include <algorithm>
 #include <vector>
 

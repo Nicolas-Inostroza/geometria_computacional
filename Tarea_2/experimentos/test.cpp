@@ -1,8 +1,8 @@
-#include "punto.cpp"
-#include "vector.cpp"
-#include "poligono.cpp"
-#include "incrementalalgorithm.hpp"
-#include "randomincrementalalgorithm.hpp"
+#include "../tarea1/punto.cpp"
+#include "../tarea1/vector.cpp"
+#include "../tarea1/poligono.cpp"
+#include "../algorithms/incrementalalgorithm.hpp"
+#include "../algorithms/randomincrementalalgorithm.hpp"
 #include "pointcloudgenerator.hpp"
 #include <algorithm>
 #include <cassert>

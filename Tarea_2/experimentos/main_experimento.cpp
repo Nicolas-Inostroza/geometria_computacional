@@ -1,8 +1,8 @@
-#include "punto.cpp"
-#include "vector.cpp"
-#include "poligono.cpp"
-#include "incrementalalgorithm.hpp"
-#include "randomincrementalalgorithm.hpp"
+#include "../tarea1/punto.cpp"
+#include "../tarea1/vector.cpp"
+#include "../tarea1/poligono.cpp"
+#include "../algorithms/incrementalalgorithm.hpp"
+#include "../algorithms/randomincrementalalgorithm.hpp"
 #include "pointcloudgenerator.hpp"
 
 #include <algorithm>
@@ -191,7 +191,7 @@ int main(int argc, char* argv[]) {
             : default_repetitions;
         const std::string output_path = argc > 3
             ? argv[3]
-            : "resultados_experimento.csv";
+            : "experiments/resultados_experimento.csv";
         const unsigned int seed = argc > 4
             ? static_cast<unsigned int>(
                 parse_positive_integer(argv[4], "semilla")
